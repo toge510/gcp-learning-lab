@@ -1,0 +1,65 @@
+---
+adaptiveProtectionConfig:
+  layer7DdosDefenseConfig:
+    enable: false
+advancedOptionsConfig:
+  jsonCustomConfig: {}
+  jsonParsing: STANDARD
+  logLevel: VERBOSE
+  requestBodyInspectionSize: 8KB
+creationTimestamp: '2026-08-02T02:26:02.146-07:00'
+description: waf policy
+fingerprint: wqfTnkecaqA=
+id: '1990381997977154501'
+kind: compute#securityPolicy
+labelFingerprint: vezUS-42LLM=
+labels:
+  goog-terraform-provisioned: 'true'
+name: waf-policy
+rules:
+- action: allow
+  description: ip
+  kind: compute#securityPolicyRule
+  match:
+    config:
+      srcIpRanges:
+      - 61.203.20.83
+    versionedExpr: SRC_IPS_V1
+  preview: false
+  priority: 100
+- action: deny(403)
+  description: xss
+  kind: compute#securityPolicyRule
+  match:
+    expr:
+      expression: "evaluatePreconfiguredWaf('xss-v33-stable', {'sensitivity': 2, 'opt_out_rule_ids':\
+        \ ['owasp-crs-v030301-id941100-xss', 'owasp-crs-v030301-id941101-xss']})"
+  preconfiguredWafConfig:
+    exclusions:
+    - requestCookiesToExclude:
+      - op: EQUALS
+        val: session_id
+      targetRuleSet: java-v33-stable
+  preview: false
+  priority: 1000
+- action: deny(403)
+  description: sqli
+  kind: compute#securityPolicyRule
+  match:
+    expr:
+      expression: "evaluatePreconfiguredWaf('sqli-v33-stable', {'sensitivity': 1,\
+        \ 'opt_out_rule_ids': ['owasp-crs-v030301-id942100-sqli', 'owasp-crs-v030301-id942101-sqli']})"
+  preview: true
+  priority: 2000
+- action: allow
+  description: Default rule, higher priority overrides it
+  kind: compute#securityPolicyRule
+  match:
+    config:
+      srcIpRanges:
+      - '*'
+    versionedExpr: SRC_IPS_V1
+  preview: false
+  priority: 2147483647
+selfLink: https://www.googleapis.com/compute/v1/projects/dev-toge-001/global/securityPolicies/waf-policy
+type: CLOUD_ARMOR
